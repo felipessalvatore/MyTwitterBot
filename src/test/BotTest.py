@@ -40,7 +40,7 @@ class BotTest(unittest.TestCase):
         Bot(corpus=BotTest.data_path)
         self.assertTrue(os.path.exists(BotTest.csv_path),
                         msg="Not writing csv for the first time")
-        Bot(corpus=cls.data_path)
+        Bot(corpus=BotTest.data_path)
         df = pd.read_csv(BotTest.csv_path)
         self.assertEqual(df.shape, (2, 4),
                          msg="Wrong Shape\n {}".format(df))
