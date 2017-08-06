@@ -84,8 +84,8 @@ class TextManiTest(unittest.TestCase):
         Testing the function that removes links, numbers,
         double spaces and emogis from a txt file
         """
-        clean_tweet1 = "I have a repository with N folders at ok \n"
-        clean_tweet2 = "Today is the best day #Tensorflow \n"
+        clean_tweet1 = "i have a repository with N folders at ok \n"
+        clean_tweet2 = "today is the best day #tensorflow \n"
         clean_text(TextManiTest.text_path_tweets)
         new_text = []
         for line in open(TextManiTest.clean_txt_path):
@@ -103,8 +103,8 @@ class TextManiTest(unittest.TestCase):
         """
         train_path, valid_path, test_path = clean_and_cut(TextManiTest.text_path_tweets)
         train_path, valid_path, test_path = clean_and_cut(TextManiTest.text_path_tweets)
-        clean_tweet1 = "I have a repository with N folders at ok \n"
-        clean_tweet2 = "Today is the best day #Tensorflow "
+        clean_tweet1 = "i have a repository with N folders at ok \n"
+        clean_tweet2 = "today is the best day #tensorflow "
         result_train = file_len(train_path)
         result_valid = file_len(valid_path)
         result_test = file_len(test_path)
