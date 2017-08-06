@@ -20,7 +20,7 @@ sys.path.insert(0, parentdir)
 
 from utils import get_real_friends, get_date
 from twitter.TweetGenerator import TweetGenerator
-
+from twitter.functions import TweetValid
 
 class Bot():
     """
@@ -78,6 +78,72 @@ class Bot():
             new_df.to_csv(csv_name, index=False)
         except OSError:
             self.df.to_csv(csv_name, index=False)
+
+    def curator_writer(self,
+                       num_tweets,
+                       num_hashtags=5):
+        """
+        Method to write "num_tweets" tweets. Here I use a loop
+        to get an input to the user to choose one tweet.
+        At the end of the loop the method write a txt file with
+        all the tweets.
+
+        :type num_tweets: int
+        :type num_hashtags: int
+        :rtype: str
+        """
+        saved_tweets = []
+        tg = TweetGenerator(text_path=self.corpus,
+                            black_list=self.black_list,
+                            train=False)
+        while len(saved_tweets) < num_tweets:
+            print(('=-=' * 5))
+            print("You have {} saved tweets so far.".format(len(saved_tweets)))
+            print("Type the beginning of a tweet")
+            print(('=-=' * 5))
+            first_part = input('> ')
+            if not TweetValid(first_part):
+                first_part = '<eos>'
+                print("Too long!!\nstarting text = <eos>")
+            for i in range(num_tweets):
+                trends = self.api.trends_place(1)[0]['trends']
+                TrendsNames = [trend['name'] for trend in trends]
+                hashtags = [words for words in TrendsNames if words[0] == "#"]
+                if len(hashtags) < num_hashtags:
+                    num_hashtags = max(len(hashtags)-1, 1)
+                    print("Picking only {} hashtags".format(num_hashtags))
+                choice = np.random.choice(len(hashtags), num_hashtags)
+                my_hashtags = [hashtags[i] for i in choice]
+                tweets = tg.generate_tweet_list(number_of_tweets=num_tweets,
+                                                starting_text=first_part,
+                                                hashtag_list=my_hashtags)
+                for i, tweet in enumerate(tweets):
+                    print("{0}) {1}".format(i, tweet))
+                user_choice = -1
+                number_of_tweets = len(tweets)
+                while user_choice not in range(number_of_tweets):
+                    print(('=-=' * 5))
+                    print("Choose one tweet!")
+                    print("Type a number from 0 to {}".format(number_of_tweets - 1))
+                    print("Or type -99 to generate other tweets")
+                    print(('=-=' * 5))
+                    user_choice = input('> ')
+                    try:
+                        user_choice = int(user_choice)
+                    except ValueError:
+                        print("Oops! That was no valid number.")
+                    if user_choice == -99:
+                        break
+            if user_choice >= 0:
+                saved_tweets.append(tweets[user_choice])
+        draft_folder = os.path.join(os.getcwd(), "twitter_draft")
+        filename = os.path.join(draft_folder, get_date() + ".txt")
+        if not os.path.exists(draft_folder):
+            os.makedirs(draft_folder)
+        with open(filename, "w") as f:
+            for tweet in saved_tweets:
+                f.write(tweet)
+        return filename
 
     def write(self,
               num_tweets,
