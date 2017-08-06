@@ -37,7 +37,7 @@ class BotTest(unittest.TestCase):
         twitter status in a csv file. This function tests
         if he is saving the correct information.
         """
-        Bot(corpus=cls.data_path)
+        Bot(corpus=BotTest.data_path)
         self.assertTrue(os.path.exists(BotTest.csv_path),
                         msg="Not writing csv for the first time")
         Bot(corpus=cls.data_path)
