@@ -46,10 +46,17 @@ class DataHolder():
             assert os.path.exists(self.path_valid), "wrong folder!"
             assert os.path.exists(self.path_test), "wrong folder!"
         else:
-            path_train, path_valid, path_test = clean_and_cut(text_path)
-            self.path_train = path_train
-            self.path_valid = path_valid
-            self.path_test = path_test
+            self.path_train = text_path[:-4] + "CLEANTRAIN.txt"
+            self.path_valid = text_path[:-4] + "CLEANVALID.txt"
+            self.path_test = text_path[:-4] + "CLEANTEST.txt"
+            condition1 = os.path.exists(self.path_train)
+            condition2 = os.path.exists(self.path_valid)
+            condition3 = os.path.exists(self.path_test)
+            if not (condition1 and condition2 and condition3):
+                path_train, path_valid, path_test = clean_and_cut(text_path)
+                self.path_train = path_train
+                self.path_valid = path_valid
+                self.path_test = path_test
         self.load_data(debug)
         self.all_noums = [noum for noum in list(self.all_noums)
                           if noum.find(self.blob_unk_token) == -1]
