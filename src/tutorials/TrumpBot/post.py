@@ -22,7 +22,7 @@ parser.add_argument("-m",
                     help="minutes to wait between posting (default=60)")
 
 user_args = parser.parse_args()
-
+print(user_args)
 TrumpCorpus = os.path.join(parentparentdir, "data", "TrumpTweets.txt")
 my_bot = Bot(corpus=TrumpCorpus)
 my_bot.post_from_txt(text_path=user_args.text_path,

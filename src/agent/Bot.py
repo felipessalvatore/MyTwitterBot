@@ -150,23 +150,23 @@ class Bot():
 
     def post_from_txt(self,
                       text_path,
-                      minutes_pause=60):
+                      minutes_paused=60):
         """
         Method to post all the tweets from the txt in "text_path".
         Each tweet is posted after a pause of
-        "minutes_pause" minutes (default is one hour).
+        "minutes_paused" minutes (default is one hour).
 
         :type text_path: str
-        :type minutes_pause: int
+        :type minutes_paused: int
         """
-        seconds_pause = minutes_pause * 60
+        seconds_pause = minutes_paused * 60
         num_tweets = file_len(text_path)
         with open(text_path) as file:
             for i, tweet in enumerate(file):
                 if TweetValid(tweet):
                     print("Posting {0} from {1}".format(i, num_tweets))
                     self.api.update_status(tweet)
-                    print("Waiting {} minutes".format(minutes_pause))
+                    print("Waiting {} minutes".format(minutes_paused))
                     time.sleep(seconds_pause)
 
     def write(self,
@@ -207,3 +207,4 @@ class Bot():
                 self.api.update_status(tweet)
                 print("Waiting {} minutes".format(minutes_pause))
                 time.sleep(seconds_pause)
+

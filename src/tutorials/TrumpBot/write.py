@@ -24,7 +24,7 @@ parser.add_argument("-s",
                     default=10,
                     help="number of tweets to show to the user (default=10)")
 
-parser.add_argument("-h",
+parser.add_argument("-H",
                     "--hashtags",
                     type=int,
                     default=5,
