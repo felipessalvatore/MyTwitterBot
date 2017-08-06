@@ -18,9 +18,10 @@ currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfram
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 
-from utils import get_real_friends, get_date
+from utils import get_real_friends, get_date, get_date_and_time
 from twitter.TweetGenerator import TweetGenerator
 from twitter.functions import TweetValid
+
 
 class Bot():
     """
@@ -81,6 +82,7 @@ class Bot():
 
     def curator_writer(self,
                        num_tweets,
+                       show_tweets=10,
                        num_hashtags=5):
         """
         Method to write "num_tweets" tweets. Here I use a loop
@@ -105,44 +107,43 @@ class Bot():
             if not TweetValid(first_part):
                 first_part = '<eos>'
                 print("Too long!!\nstarting text = <eos>")
-            for i in range(num_tweets):
-                trends = self.api.trends_place(1)[0]['trends']
-                TrendsNames = [trend['name'] for trend in trends]
-                hashtags = [words for words in TrendsNames if words[0] == "#"]
-                if len(hashtags) < num_hashtags:
-                    num_hashtags = max(len(hashtags)-1, 1)
-                    print("Picking only {} hashtags".format(num_hashtags))
-                choice = np.random.choice(len(hashtags), num_hashtags)
-                my_hashtags = [hashtags[i] for i in choice]
-                tweets = tg.generate_tweet_list(number_of_tweets=num_tweets,
-                                                starting_text=first_part,
-                                                hashtag_list=my_hashtags)
-                for i, tweet in enumerate(tweets):
-                    print("{0}) {1}".format(i, tweet))
-                user_choice = -1
-                number_of_tweets = len(tweets)
-                while user_choice not in range(number_of_tweets):
-                    print(('=-=' * 5))
-                    print("Choose one tweet!")
-                    print("Type a number from 0 to {}".format(number_of_tweets - 1))
-                    print("Or type -99 to generate other tweets")
-                    print(('=-=' * 5))
-                    user_choice = input('> ')
-                    try:
-                        user_choice = int(user_choice)
-                    except ValueError:
-                        print("Oops! That was no valid number.")
-                    if user_choice == -99:
-                        break
+            trends = self.api.trends_place(1)[0]['trends']
+            TrendsNames = [trend['name'] for trend in trends]
+            hashtags = [words for words in TrendsNames if words[0] == "#"]
+            if len(hashtags) < num_hashtags:
+                num_hashtags = max(len(hashtags)-1, 1)
+                print("Picking only {} hashtags".format(num_hashtags))
+            choice = np.random.choice(len(hashtags), num_hashtags)
+            my_hashtags = [hashtags[i] for i in choice]
+            tweets = tg.generate_tweet_list(number_of_tweets=show_tweets,
+                                            starting_text=first_part,
+                                            hashtag_list=my_hashtags)
+            for i, tweet in enumerate(tweets):
+                print("{0}) {1}".format(i, tweet))
+            user_choice = -1
+            number_of_tweets = len(tweets)
+            while True:
+                print(('=-=' * 5))
+                print("Choose one tweet!")
+                print("Type a number from 0 to {}".format(number_of_tweets - 1))
+                print("Or type -99 to generate other tweets")
+                print(('=-=' * 5))
+                user_choice = input('> ')
+                try:
+                    user_choice = int(user_choice)
+                except ValueError:
+                    print("Oops! That was no valid number.")
+                if user_choice == -99 or user_choice in range(number_of_tweets):
+                    break
             if user_choice >= 0:
                 saved_tweets.append(tweets[user_choice])
         draft_folder = os.path.join(os.getcwd(), "twitter_draft")
-        filename = os.path.join(draft_folder, get_date() + ".txt")
+        filename = os.path.join(draft_folder, get_date_and_time() + ".txt")
         if not os.path.exists(draft_folder):
             os.makedirs(draft_folder)
         with open(filename, "w") as f:
             for tweet in saved_tweets:
-                f.write(tweet)
+                f.write(tweet + "\n")
         return filename
 
     def write(self,
@@ -183,3 +184,4 @@ class Bot():
                 self.api.update_status(tweet)
                 print("Waiting {} minutes".format(minutes_pause))
                 time.sleep(seconds_pause)
+

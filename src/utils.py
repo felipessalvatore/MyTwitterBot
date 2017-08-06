@@ -37,6 +37,16 @@ def get_date():
     return time.strftime('%d-%m-%Y')
 
 
+def get_date_and_time():
+    """
+    Function to create an unique label
+    using the date and time.
+
+    :rtype: str
+    """
+    return time.strftime('%d-%m-%Y_%H-%M-%S')
+
+
 def get_real_friends():
     """
     Function that returns a list of all the people on
