@@ -31,8 +31,8 @@ parser.add_argument("-H",
                     help="number of hashtags (default=3)")
 user_args = parser.parse_args()
 
-TrumpCorpus = os.path.join(parentparentdir, "data", "TrumpTweets.txt")
-my_bot = Bot(corpus=TrumpCorpus, commentary="TrumpBot")
+SakaCorpus = os.path.join(parentparentdir, "data", "SakaCorpus.txt")
+my_bot = Bot(corpus=SakaCorpus, commentary="SakaBot")
 my_bot.curator_writer(num_tweets=user_args.tweets,
                       show_tweets=user_args.show,
                       num_hashtags=user_args.hashtags)
