@@ -8,7 +8,7 @@
 
 This repository started as an extension of the code of [Assigment 2](http://cs224d.stanford.edu/assignment2/index.html) from [Standford's deep leaning course on NLP](https://www.youtube.com/playlist?list=PL3FW7Lu3i5Jsnh1rnUwq_TcylNr7EkRe6).
 
-I used a RNN to create a [language model](http://www.fit.vutbr.cz/research/groups/speech/publi/2010/mikolov_interspeech2010_IS100722.pdf). The Twitter bot is based on this language model. The corpus that is stored in the folder "data" is the [Penn Tree Bank (PTB)](https://catalog.ldc.upenn.edu/ldc99t42) dataset. The idea is to use different corpora to generate more creative and fun tweets (to be done).
+I used a RNN to create a [language model](http://www.fit.vutbr.cz/research/groups/speech/publi/2010/mikolov_interspeech2010_IS100722.pdf). The Twitter bot is based on this language model. There is some corpora in the folder data. But the default one is the [Penn Tree Bank (PTB)](https://catalog.ldc.upenn.edu/ldc99t42) dataset. You can use different corpora to generate more creative and fun tweets.
 
 Using the PTB corpus I can create wonderfull tweets like this one:
 
