@@ -2,6 +2,7 @@ import os
 import argparse
 import sys
 import inspect
+from friends import TrumpFriends
 
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
@@ -32,7 +33,9 @@ parser.add_argument("-H",
 user_args = parser.parse_args()
 
 TrumpCorpus = os.path.join(parentparentdir, "data", "TrumpTweets.txt")
-my_bot = Bot(corpus=TrumpCorpus, commentary="TrumpBot")
-my_bot.curator_writer(num_tweets=user_args.tweets,
-                      show_tweets=user_args.show,
-                      num_hashtags=user_args.hashtags)
+my_bot = Bot(corpus=TrumpCorpus, friends=TrumpFriends, commentary="TrumpBot")
+path = my_bot.curator_writer(num_tweets=user_args.tweets,
+                             show_tweets=user_args.show,
+                             num_hashtags=user_args.hashtags)
+
+print("\n file can be found in {}".format(path))

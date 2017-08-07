@@ -5,11 +5,19 @@ src/test/key.py
 src/tutorials/key.py
 
 #TF files
-src/checkpoints
+src/tutorials/PTBBOT/checkpoints
+src/tutorials/SakaBot/checkpoints
+src/tutorials/TrumpBot/checkpoints/
 
 #log_files
-src/tutorials/twitter_log/
+src/tutorials/PTBBOT/twitter_log/
+src/tutorials/SakaBot/twitter_log/
+src/tutorials/TrumpBot/twitter_log/
 
+#draft_files
+src/tutorials/PTBBOT/twitter_draft/
+src/tutorials/SakaBot/twitter_draft/
+src/tutorials/TrumpBot/twitter_draft/
 
 
 # Byte-compiled / optimized / DLL files

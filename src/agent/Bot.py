@@ -36,11 +36,13 @@ class Bot():
     youtube https://www.youtube.com/watch?v=M7MqML2ZVOY
 
     :type corpus: str
+    :type friends: list of str
     :type commentary: srt
     :type black_list: list
     """
-    def __init__(self, corpus, commentary="None", black_list=[]):
+    def __init__(self, corpus, friends=[], commentary="None", black_list=[]):
         self.black_list = black_list
+        self.friends = friends
         self.corpus = corpus
         auth = tweepy.OAuthHandler(ConsumerKey, ConsumerSecret)
         auth.set_access_token(AccessToken, AccessTokenSecret)
@@ -89,7 +91,8 @@ class Bot():
         Method to write "num_tweets" tweets. Here I use a loop
         to get an input to the user to choose one tweet.
         At the end of the loop the method write a txt file with
-        all the tweets.
+        all the tweets. We use the trending hashtags and the bot's
+        frieds to compose the tweet.
 
         :type num_tweets: int
         :type num_hashtags: int
@@ -111,11 +114,12 @@ class Bot():
             trends = self.api.trends_place(1)[0]['trends']
             TrendsNames = [trend['name'] for trend in trends]
             hashtags = [words for words in TrendsNames if words[0] == "#"]
-            if len(hashtags) < num_hashtags:
-                num_hashtags = max(len(hashtags)-1, 1)
+            hashtags_and_friends = self.friends + hashtags
+            if len(hashtags_and_friends) < num_hashtags:
+                num_hashtags = max(len(hashtags_and_friends) - 1, 1)
                 print("Picking only {} hashtags".format(num_hashtags))
-            choice = np.random.choice(len(hashtags), num_hashtags)
-            my_hashtags = [hashtags[i] for i in choice]
+            choice = np.random.choice(len(hashtags_and_friends), num_hashtags)
+            my_hashtags = [hashtags_and_friends[i] for i in choice]
             tweets = tg.generate_tweet_list(number_of_tweets=show_tweets,
                                             starting_text=first_part,
                                             hashtag_list=my_hashtags)
@@ -145,7 +149,6 @@ class Bot():
         with open(filename, "w") as f:
             for tweet in saved_tweets:
                 f.write(tweet + "\n")
-        print("tweets file = {}".format(filename))
         return filename
 
     def post_from_txt(self,
@@ -196,7 +199,7 @@ class Bot():
             TrendsNames = [trend['name'] for trend in trends]
             hashtags = [words for words in TrendsNames if words[0] == "#"]
             if len(hashtags) < num_hashtags:
-                num_hashtags = max(len(hashtags)-1, 1)
+                num_hashtags = max(len(hashtags) - 1, 1)
                 print("Picking only {} hashtags".format(num_hashtags))
             choice = np.random.choice(len(hashtags), num_hashtags)
             my_hashtags = [hashtags[i] for i in choice]
@@ -207,4 +210,3 @@ class Bot():
                 self.api.update_status(tweet)
                 print("Waiting {} minutes".format(minutes_pause))
                 time.sleep(seconds_pause)
-
