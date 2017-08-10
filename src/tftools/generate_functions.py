@@ -64,17 +64,18 @@ def generate_sentence(session, model, config, *args, **kwargs):
                          **kwargs)
 
 
-def generate_loop(config, ShowTest=True):
+def generate_loop(config, text_path, ShowTest=True):
     """
     Genereate sentences in the command line
     until the user type "*end*"
 
     :type config: Config()
+    :type text_path: str
     :type ShowTest: boolean
     """
     gen_config = deepcopy(config)
     gen_config.batch_size = gen_config.num_steps = 1
-    dataholder = DataHolder()
+    dataholder = DataHolder(text_path=text_path)
     model = RNNLanguageModel(gen_config, dataholder)
     with tf.Session(graph=model.graph) as sess:
         model.saver.restore(sess, model.save_path)

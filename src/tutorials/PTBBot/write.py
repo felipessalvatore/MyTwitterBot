@@ -9,6 +9,7 @@ parentparentdir = os.path.dirname(parentdir)
 sys.path.insert(0, parentparentdir)
 
 from agent.Bot import Bot
+from images.Header import RobotHeader
 
 parser = argparse.ArgumentParser()
 
@@ -31,6 +32,8 @@ parser.add_argument("-H",
                     help="number of hashtags (default=3)")
 user_args = parser.parse_args()
 
+
+print(RobotHeader)
 PTBCorpus = os.path.join(parentparentdir, "data")
 my_bot = Bot(corpus=PTBCorpus, commentary="PTBBot")
 path = my_bot.curator_writer(num_tweets=user_args.tweets,

@@ -42,4 +42,5 @@ TrumpFriends = ["@TuckerCarlson",
                 "@greta",
                 "@piersmorgan",
                 "@DonaldJTrumpJr",
-                "@IvankaTrump"]
+                "@IvankaTrump",
+                "@realDonaldTrump"]

@@ -10,6 +10,7 @@ parentparentdir = os.path.dirname(parentdir)
 sys.path.insert(0, parentparentdir)
 
 from agent.Bot import Bot
+from images.Header import RobotHeader
 
 parser = argparse.ArgumentParser()
 
@@ -32,6 +33,8 @@ parser.add_argument("-H",
                     help="number of hashtags (default=3)")
 user_args = parser.parse_args()
 
+
+print(RobotHeader)
 SakaCorpus = os.path.join(parentparentdir, "data", "SakaCorpus.txt")
 my_bot = Bot(corpus=SakaCorpus, friends=SakaFriends, commentary="SakaBot")
 path = my_bot.curator_writer(num_tweets=user_args.tweets,
