@@ -36,7 +36,10 @@ user_args = parser.parse_args()
 
 print(RobotHeader)
 TrumpCorpus = os.path.join(parentparentdir, "data", "TrumpTweets.txt")
-my_bot = Bot(corpus=TrumpCorpus, friends=TrumpFriends, commentary="TrumpBot")
+my_bot = Bot(corpus=TrumpCorpus,
+             friends=TrumpFriends,
+             commentary="TrumpBot + local=EUA",
+             local="EUA")
 path = my_bot.curator_writer(num_tweets=user_args.tweets,
                              show_tweets=user_args.show,
                              num_hashtags=user_args.hashtags)

@@ -13,6 +13,8 @@ except ImportError:
 import os
 import sys
 import inspect
+from requests_oauthlib import OAuth1Session
+import json
 
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
@@ -39,9 +41,16 @@ class Bot():
     :type friends: list of str
     :type commentary: srt
     :type black_list: list
+    :type local: str
     """
-    def __init__(self, corpus, friends=[], commentary="None", black_list=[]):
+    def __init__(self,
+                 corpus,
+                 friends=[],
+                 commentary="None",
+                 black_list=[],
+                 local="world"):
         self.black_list = black_list
+        self.local = local
         self.friends = friends
         self.corpus = corpus
         auth = tweepy.OAuthHandler(ConsumerKey, ConsumerSecret)
@@ -83,6 +92,41 @@ class Bot():
         except OSError:
             self.df.to_csv(csv_name, index=False)
 
+    def get_local_identifier(self):
+        """
+        Method to get dict local: identifier.
+        the identifier is of type WOEID (Where On Earth IDentifier).
+
+        :rtype: dict
+        """
+        WOEID = {"world": "1",
+                 "EUA": "23424977",
+                 "Brazil": "23424768"}
+        return WOEID
+
+    def get_trends(self, local):
+        """
+        Method to get the trending hashtags.
+
+        :type local: str
+        :rtype: list of str
+        """
+        session_string = "https://api.twitter.com/1.1/trends/place.json?id="
+        local_id = self.get_local_identifier()[local]
+        session_string += local_id
+        session = OAuth1Session(ConsumerKey,
+                                ConsumerSecret,
+                                AccessToken,
+                                AccessTokenSecret)
+        response = session.get(session_string)
+        if response.__dict__['status_code'] == 200:
+            local_trends = json.loads(response.text)[0]["trends"]
+            hashtags = [trend["name"]
+                        for trend in local_trends if trend["name"][0] == '#']
+        else:
+            hashtags = []
+        return hashtags
+
     def curator_writer(self,
                        num_tweets,
                        show_tweets=10,
@@ -111,15 +155,17 @@ class Bot():
             if not TweetValid(first_part):
                 first_part = '<eos>'
                 print("Too long!!\nstarting text = <eos>")
-            trends = self.api.trends_place(1)[0]['trends']
-            TrendsNames = [trend['name'] for trend in trends]
-            hashtags = [words for words in TrendsNames if words[0] == "#"]
+            hashtags = self.get_trends(self.local)
             hashtags_and_friends = self.friends + hashtags
-            if len(hashtags_and_friends) < num_hashtags:
+            h_and_f_size = len(hashtags_and_friends)
+            if h_and_f_size < num_hashtags:
                 num_hashtags = max(len(hashtags_and_friends) - 1, 1)
                 print("Picking only {} hashtags".format(num_hashtags))
-            choice = np.random.choice(len(hashtags_and_friends), num_hashtags)
-            my_hashtags = [hashtags_and_friends[i] for i in choice]
+            if h_and_f_size > 0:
+                choice = np.random.choice(h_and_f_size, num_hashtags)
+                my_hashtags = [hashtags_and_friends[i] for i in choice]
+            else:
+                my_hashtags = []
             tweets = tg.generate_tweet_list(number_of_tweets=show_tweets,
                                             starting_text=first_part,
                                             hashtag_list=my_hashtags)

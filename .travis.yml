@@ -5,6 +5,7 @@ python:
   - "3.5"
 install:
   - pip3 install numpy
+  - pip3 install requests_oauthlib
   - pip3 install pandas
   - pip3 install tensorflow
   - pip3 install tweepy
