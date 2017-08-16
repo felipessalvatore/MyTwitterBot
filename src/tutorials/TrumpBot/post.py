@@ -24,6 +24,7 @@ parser.add_argument("-m",
 user_args = parser.parse_args()
 
 TrumpCorpus = os.path.join(parentparentdir, "data", "TrumpTweets.txt")
-my_bot = Bot(corpus=TrumpCorpus, commentary="TrumpBot")
+my_bot = Bot(corpus=TrumpCorpus,
+             commentary="TrumpBot + local=EUA")
 my_bot.post_from_txt(text_path=user_args.text_path,
                      minutes_paused=user_args.minutes)
