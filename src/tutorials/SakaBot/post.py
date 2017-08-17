@@ -24,15 +24,15 @@ parser.add_argument("-m",
 user_args = parser.parse_args()
 
 SakaCorpus = os.path.join(parentparentdir, "data", "SakaCorpus.txt")
-# SakaHastag = ["#foratemer",
-#               "#foradoria",
-#               '#DemocraciaJá',
-#               '#ForaTemer',
-#               "#foraDória",
-#               '#DiarioDoMundo']
+SakaHastag = ["#foratemer",
+              "#foradoria",
+              '#DemocraciaJá',
+              '#ForaTemer',
+              "#foraDória",
+              '#DiarioDoMundo']
 my_bot = Bot(corpus=SakaCorpus,
              commentary="SakaBot + local=Brazil + like_retweet_follow",
              local="Brazil",
-             hashtag_search=None)
+             hashtag_search=SakaHastag)
 my_bot.post_from_txt(text_path=user_args.text_path,
                      minutes_paused=user_args.minutes)

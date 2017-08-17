@@ -206,7 +206,7 @@ class Bot():
     def post_from_txt(self,
                       text_path,
                       minutes_paused=2,
-                      num_tweets=51):
+                      num_tweets_to_see=51):
         """
         Method to post all the tweets from the txt in "text_path".
         Each tweet is posted and after that the bot starts to
@@ -217,7 +217,7 @@ class Bot():
 
         :type text_path: str
         :type minutes_paused: int
-        :type num_tweets: int
+        :type num_tweets_to_see: int
         """
         seconds_pause = minutes_paused * 60
         num_tweets = file_len(text_path)
@@ -233,7 +233,7 @@ class Bot():
                     for tweet in tweepy.Cursor(self.api.search,
                                                q=current_hashtag).items():
                         print("\ncount = {}".format(count))
-                        if count < num_tweets:
+                        if count < num_tweets_to_see:
                             try:
                                 # Favorite the tweet
                                 tweet.favorite()
@@ -255,6 +255,7 @@ class Bot():
                                 print("No more tweets for the hashtag = {}".format(current_hashtag))
                                 break
                         else:
+                            print("\ncount = {}, above upper bound".format(count))
                             break
 
     def write(self,
