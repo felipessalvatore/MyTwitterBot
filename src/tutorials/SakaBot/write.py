@@ -44,7 +44,7 @@ SakaHastag = ["#foratemer",
               '#DiarioDoMundo']
 my_bot = Bot(corpus=SakaCorpus,
              friends=SakaFriends,
-             commentary="SakaBot + local=Brazil",
+             commentary="SakaBot + local=Brazil + like_retweet_follow",
              local="Brazil",
              hashtag_search=SakaHastag)
 path = my_bot.curator_writer(num_tweets=user_args.tweets,
