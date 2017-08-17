@@ -67,7 +67,7 @@ class Bot():
         if hashtag_search is None:
             self.hashtag_search = self.get_trends(self.local)
         else:
-            self.hashtag_search = hashtag_search
+            self.hashtag_search = hashtag_search + self.get_trends(self.local)
 
     def clear_follow(self,
                      Realfriends=get_real_friends()):
@@ -206,7 +206,7 @@ class Bot():
     def post_from_txt(self,
                       text_path,
                       minutes_paused=2,
-                      num_tweets=15):
+                      num_tweets=51):
         """
         Method to post all the tweets from the txt in "text_path".
         Each tweet is posted and after that the bot starts to
@@ -239,7 +239,7 @@ class Bot():
                                 # Follow the user who tweeted
                                 tweet.user.follow()
                                 print('Followed the user')
-                                if count % 10 == 0 and count > 0:
+                                if count % 25 == 0 and count > 0:
                                     tweet.retweet()
                                     print('Retweeted the tweet')
                                 print("Waiting {} minutes".format(minutes_paused))
