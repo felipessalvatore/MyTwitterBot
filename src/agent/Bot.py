@@ -228,9 +228,11 @@ class Bot():
                     self.api.update_status(tweet)
                     choice = np.random.choice(len(self.hashtag_search), 1)[0]
                     current_hashtag = self.hashtag_search[choice]
+                    print("\ncurrent hashtag is {}".format(current_hashtag))
                     count = 0
                     for tweet in tweepy.Cursor(self.api.search,
                                                q=current_hashtag).items():
+                        print("\ncount = {}".format(count))
                         if count < num_tweets:
                             try:
                                 # Favorite the tweet
@@ -239,10 +241,10 @@ class Bot():
                                 # Follow the user who tweeted
                                 tweet.user.follow()
                                 print('Followed the user')
-                                if count % 25 == 0 and count > 0:
+                                if count % 25 == 0:
                                     tweet.retweet()
                                     print('Retweeted the tweet')
-                                print("Waiting {} minutes".format(minutes_paused))
+                                print("\nWaiting {} minutes".format(minutes_paused))
                                 time.sleep(seconds_pause)
                                 count += 1
 
@@ -250,6 +252,7 @@ class Bot():
                                 print(e.reason)
 
                             except StopIteration:
+                                print("No more tweets for the hashtag = {}".format(current_hashtag))
                                 break
                         else:
                             break
