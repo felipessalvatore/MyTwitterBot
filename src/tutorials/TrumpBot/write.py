@@ -38,7 +38,7 @@ print(RobotHeader)
 TrumpCorpus = os.path.join(parentparentdir, "data", "TrumpTweets.txt")
 my_bot = Bot(corpus=TrumpCorpus,
              friends=TrumpFriends,
-             commentary="TrumpBot + local=EUA",
+             commentary="TrumpBot + local=EUA + like_retweet_follow",
              local="EUA")
 path = my_bot.curator_writer(num_tweets=user_args.tweets,
                              show_tweets=user_args.show,

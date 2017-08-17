@@ -18,13 +18,21 @@ parser.add_argument('text_path',
 parser.add_argument("-m",
                     "--minutes",
                     type=int,
-                    default=60,
-                    help="minutes to wait between posting (default=60)")
+                    default=2,
+                    help="minutes to wait between liking (default=2)")
 
 user_args = parser.parse_args()
 
 SakaCorpus = os.path.join(parentparentdir, "data", "SakaCorpus.txt")
+SakaHastag = ["#foratemer",
+              "#foradoria",
+              '#DemocraciaJá',
+              '#ForaTemer',
+              "#foraDória",
+              '#DiarioDoMundo']
 my_bot = Bot(corpus=SakaCorpus,
-             commentary="SakaBot + local=Brazil")
+             commentary="SakaBot + local=Brazil + like_retweet_follow",
+             local="Brazil",
+             hashtag_search=SakaHastag)
 my_bot.post_from_txt(text_path=user_args.text_path,
                      minutes_paused=user_args.minutes)

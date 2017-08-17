@@ -35,7 +35,7 @@ user_args = parser.parse_args()
 
 print(RobotHeader)
 PTBCorpus = os.path.join(parentparentdir, "data")
-my_bot = Bot(corpus=PTBCorpus, commentary="PTBBot")
+my_bot = Bot(corpus=PTBCorpus, commentary="PTBBot + like_retweet_follow")
 path = my_bot.curator_writer(num_tweets=user_args.tweets,
                              show_tweets=user_args.show,
                              num_hashtags=user_args.hashtags)

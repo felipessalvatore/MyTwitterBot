@@ -42,13 +42,15 @@ class Bot():
     :type commentary: srt
     :type black_list: list
     :type local: str
+    :type hashtag_search: None or list
     """
     def __init__(self,
                  corpus,
                  friends=[],
                  commentary="None",
                  black_list=[],
-                 local="world"):
+                 local="world",
+                 hashtag_search=None):
         self.black_list = black_list
         self.local = local
         self.friends = friends
@@ -62,6 +64,10 @@ class Bot():
                  ("Commentary", [commentary])]
         self.df = pd.DataFrame.from_items(entry)
         self.log()
+        if hashtag_search is None:
+            self.hashtag_search = self.get_trends(self.local)
+        else:
+            self.hashtag_search = hashtag_search
 
     def clear_follow(self,
                      Realfriends=get_real_friends()):
@@ -199,14 +205,19 @@ class Bot():
 
     def post_from_txt(self,
                       text_path,
-                      minutes_paused=60):
+                      minutes_paused=2,
+                      num_tweets=15):
         """
         Method to post all the tweets from the txt in "text_path".
-        Each tweet is posted after a pause of
-        "minutes_paused" minutes (default is one hour).
+        Each tweet is posted and after that the bot starts to
+        liking tweets that have the same hasthags as the ones in the list
+        self.hashtag_search, the bot also retweet the theets and follow the
+        user. After that it pause for "minutes_paused" minutes
+        (default is 2 minutes).
 
         :type text_path: str
         :type minutes_paused: int
+        :type num_tweets: int
         """
         seconds_pause = minutes_paused * 60
         num_tweets = file_len(text_path)
@@ -215,8 +226,33 @@ class Bot():
                 if TweetValid(tweet):
                     print("Posting {0} from {1}".format(i, num_tweets))
                     self.api.update_status(tweet)
-                    print("Waiting {} minutes".format(minutes_paused))
-                    time.sleep(seconds_pause)
+                    choice = np.random.choice(len(self.hashtag_search), 1)[0]
+                    current_hashtag = self.hashtag_search[choice]
+                    count = 0
+                    for tweet in tweepy.Cursor(self.api.search,
+                                               q=current_hashtag).items():
+                        if count < num_tweets:
+                            try:
+                                # Favorite the tweet
+                                tweet.favorite()
+                                print('Favorited the tweet')
+                                # Follow the user who tweeted
+                                tweet.user.follow()
+                                print('Followed the user')
+                                if count % 10 == 0 and count > 0:
+                                    tweet.retweet()
+                                    print('Retweeted the tweet')
+                                print("Waiting {} minutes".format(minutes_paused))
+                                time.sleep(seconds_pause)
+                                count += 1
+
+                            except tweepy.TweepError as e:
+                                print(e.reason)
+
+                            except StopIteration:
+                                break
+                        else:
+                            break
 
     def write(self,
               num_tweets,

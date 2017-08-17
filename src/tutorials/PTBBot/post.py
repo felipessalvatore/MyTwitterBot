@@ -24,6 +24,6 @@ parser.add_argument("-m",
 user_args = parser.parse_args()
 
 PTBCorpus = os.path.join(parentparentdir, "data")
-my_bot = Bot(corpus=PTBCorpus, commentary="PTBBot")
+my_bot = Bot(corpus=PTBCorpus, commentary="PTBBot + like_retweet_follow")
 my_bot.post_from_txt(text_path=user_args.text_path,
                      minutes_paused=user_args.minutes)
