@@ -8,7 +8,7 @@
 
 This repository started as an extension of the code of [Assigment 2](http://cs224d.stanford.edu/assignment2/index.html) from [Standford's deep leaning course on NLP](https://www.youtube.com/playlist?list=PL3FW7Lu3i5Jsnh1rnUwq_TcylNr7EkRe6). After finishing the assignment I tried to transform the code in something useful (you can judge if I achieve that in any form).
 
-I used a RNN to create a [language model](http://www.fit.vutbr.cz/research/groups/speech/publi/2010/mikolov_interspeech2010_IS100722.pdf) and with that I created a Twitter bot. There is some corpora in the folder 'data':
+I used a RNN to create a [language model](http://www.fit.vutbr.cz/research/groups/speech/publi/2010/mikolov_interspeech2010_IS100722.pdf) and with that I created a Twitter bot. There are some corpora in the folder 'data':
 
 - The [Penn Tree Bank (PTB)](https://catalog.ldc.upenn.edu/ldc99t42) dataset.
 
@@ -55,7 +55,7 @@ After training, you can interact with the bot to write any number of tweets; jus
 $ python3 write.py
 
 ```
-All tweets that you wrote from this interecation will be stored on the folder "twitter_draft". Suppose "date.txt" is a text file with some tweets, you can edit this file and then run:
+All tweets that you wrote from this interaction will be stored on the folder "twitter_draft". Suppose "date.txt" is a text file with some tweets, you can edit this file and then run:
 
 ```
 $ python3 post.py ./twitter_draft/date.txt -m 30
