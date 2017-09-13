@@ -10,13 +10,13 @@ sys.path.insert(0, parentparentdir)
 
 from tftools.Config import Config
 from tftools.DataHolder import DataHolder
-from tftools.RNNLanguageModel import RNNLanguageModel
+from tftools.LSTMLanguageModel import LSTMLanguageModel
 from tftools.train_functions import train_model
 
 
 PTBCorpus = os.path.join(parentparentdir, "data")
 my_config = Config()
 my_dataholder = DataHolder(text_path=PTBCorpus)
-model = RNNLanguageModel(config=my_config,
+model = LSTMLanguageModel(config=my_config,
                          dataholder=my_dataholder)
-train_model(model)
+train_model(model,lstm=True)

@@ -16,7 +16,8 @@ def run_epoch(model,
               session,
               data,
               train_op=None,
-              verbose=10):
+              verbose=10,
+              lstm=False):
     """
     Use the tf graph of the model to run one epoch
     through the data using the tf session.
@@ -39,12 +40,18 @@ def run_epoch(model,
     DataIte2 = ptb_iterator(data, config.batch_size, config.num_steps)
     total_steps = sum(1 for _ in DataIte1)
     total_loss = []
-    state = session.run(model.initial_state)
+    if not lstm:
+        state = session.run(model.initial_state)
     for step, (x, y) in enumerate(DataIte2):
-        feed = {model.input_placeholder: x,
-                model.labels_placeholder: y,
-                model.initial_state: state,
-                model.dropout_placeholder: dp}
+        if not lstm:
+            feed = {model.input_placeholder: x,
+                    model.labels_placeholder: y,
+                    model.initial_state: state,
+                    model.dropout_placeholder: dp}
+        else:
+            feed = {model.input_placeholder: x,
+                    model.labels_placeholder: y,
+                    model.dropout_placeholder: dp}
         loss, state, _ = session.run([model.loss, model.final_state, train_op],
                                      feed_dict=feed)
         total_loss.append(loss)
@@ -60,7 +67,8 @@ def run_epoch(model,
 
 def train_model(model,
                 save=True,
-                debug=False):
+                debug=False,
+                lstm=False):
     """
     Use the tf graph of the model to train the model
 
@@ -83,10 +91,12 @@ def train_model(model,
             train_pp = run_epoch(model,
                                  sess,
                                  model.encoded_train,
-                                 model.train_op)
+                                 model.train_op,
+                                 lstm=lstm)
             valid_pp = run_epoch(model,
                                  sess,
-                                 model.encoded_valid)
+                                 model.encoded_valid,
+                                 lstm=lstm)
             print(('Training perplexity: {}'.format(train_pp)))
             print(('Validation perplexity: {}'.format(valid_pp)))
             if valid_pp < best_val_pp:

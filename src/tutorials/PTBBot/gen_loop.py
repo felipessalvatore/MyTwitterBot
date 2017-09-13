@@ -13,4 +13,4 @@ from tftools.generate_functions import generate_loop
 
 PTBCorpus = os.path.join(parentparentdir, "data")
 my_config = Config()
-generate_loop(my_config, text_path=PTBCorpus)
+generate_loop(my_config, text_path=PTBCorpus, lstm=True)
