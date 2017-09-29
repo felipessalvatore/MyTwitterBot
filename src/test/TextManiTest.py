@@ -2,6 +2,9 @@ import unittest
 import os
 import sys
 import inspect
+import os.path
+import shutil
+import tensorflow as tf
 
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
@@ -10,6 +13,7 @@ sys.path.insert(0, parentdir)
 from utils import run_test
 from text_processing.functions import read_line_eos, clean_text
 from text_processing.functions import file_len, text_cut, clean_and_cut
+from text_processing.functions import batch_producer, folder2lists, text2folder
 from text_processing.Vocab import Vocab
 
 
@@ -171,6 +175,50 @@ class TextManiTest(unittest.TestCase):
                          msg="result = {}".format(result))
 
 
+class PtbReaderTest(tf.test.TestCase):
+    """
+    Test class for the reader functions
+    """
+    def setUp(self):
+        data_path = os.path.join(parentdir, 'data')
+        self.text_path_toy = os.path.join(data_path, 'toy.txt')
+        self.tmpdir = "toy"
+
+    def testPtbRawData(self):
+        """
+        Creates a temporary folder with tree files: train,
+        valid and test; and check if the ptb_raw_data outputs
+        four values.
+        """
+        text2folder(self.text_path_toy, self.tmpdir)
+        output = folder2lists(self.tmpdir)
+        if os.path.exists(self.tmpdir):
+            shutil.rmtree(self.tmpdir)
+        self.assertEqual(len(output), 4)
+
+    def testPtbProducer(self):
+        """
+        Check if the ptb_producer creates the data accordingly.
+        """
+        raw_data = [4, 3, 2, 1, 0, 5, 6, 1, 1, 1, 1, 0, 3, 4, 1]
+        batch_size = 3
+        num_steps = 2
+        x, y = batch_producer(raw_data, batch_size, num_steps)
+        with self.test_session() as session:
+            coord = tf.train.Coordinator()
+            tf.train.start_queue_runners(session, coord=coord)
+        try:
+            xval, yval = session.run([x, y])
+            self.assertAllEqual(xval, [[4, 3], [5, 6], [1, 0]])
+            self.assertAllEqual(yval, [[3, 2], [6, 1], [0, 3]])
+            xval, yval = session.run([x, y])
+            self.assertAllEqual(xval, [[2, 1], [1, 1], [3, 4]])
+            self.assertAllEqual(yval, [[1, 0], [1, 1], [4, 1]])
+        finally:
+            coord.request_stop()
+            coord.join()
+
+
 if __name__ == "__main__":
-    run_test(TextManiTest,
-             "\n=== Running test for the text manipulation functions ===\n")
+    print("\n=== Running test for the text manipulation functions ===\n")
+    tf.test.main()

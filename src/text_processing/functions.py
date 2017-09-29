@@ -1,3 +1,7 @@
+import collections
+import os
+import shutil
+import tensorflow as tf
 from collections import defaultdict
 import numpy as np
 import re
@@ -194,9 +198,9 @@ def text_cut(file_path, verbose=False):
     :type file_path: str
     :type verbose: boolean
     """
-    text_size = file_len(file_path)
-    ff = int((4 / 5) * text_size)
-    rest = text_size - ff
+    tlen = file_len(file_path)
+    ff = int((4 / 5) * tlen)
+    rest = tlen - ff
     rest = int(rest / 2)
     train_path = file_path[:-4] + "TRAIN.txt"
     valid_path = file_path[:-4] + "VALID.txt"
@@ -208,17 +212,23 @@ def text_cut(file_path, verbose=False):
                     for i, line in enumerate(file):
                         if i < ff:
                             if verbose:
-                                sys.stdout.write('\rwriting train {} / {}'.format(i,text_size))
+                                trmsg = '\rwriting train {} / {}'.format(i,
+                                                                         tlen)
+                                sys.stdout.write(trmsg)
                                 sys.stdout.flush()
                             train.write(line)
                         elif ff <= i < ff + rest:
                             if verbose:
-                                sys.stdout.write('\rwriting valid {} / {}'.format(i,text_size))
+                                vamsg = '\rwriting valid {} / {}'.format(i,
+                                                                         tlen)
+                                sys.stdout.write(vamsg)
                                 sys.stdout.flush()
                             valid.write(line)
                         else:
                             if verbose:
-                                sys.stdout.write('\rwriting test {} / {}'.format(i,text_size))
+                                temsg = '\rwriting test {} / {}'.format(i,
+                                                                        tlen)
+                                sys.stdout.write(temsg)
                                 sys.stdout.flush()
                             test.write(line)
 
@@ -239,3 +249,180 @@ def clean_and_cut(file_path, verbose=False):
     file_path = file_path[:-4] + "CLEAN.txt"
     text_cut(file_path, verbose)
     return train_path, valid_path, test_path
+
+
+def text2folder(file_path, folder_name, verbose=False):
+    """
+    Given the txt file in "file_path" this function
+    separetes four fifths of the lines and write them in the file
+    "file_pathTRAIN.txt" (that is why we use the
+    variable ff).
+    The rest of the text is divide into valid and test txts.
+
+    The 3 files are saved in the folder "folder_name"
+
+    :type file_path: str
+    :type folder_name: str
+    :type verbose: boolean
+    """
+    tlen = file_len(file_path)
+    ff = int((4 / 5) * tlen)
+    rest = tlen - ff
+    rest = int(rest / 2)
+    if os.path.exists(folder_name):
+        shutil.rmtree(folder_name)
+    os.makedirs(folder_name)
+    train_path = os.path.join(folder_name, "train.txt")
+    valid_path = os.path.join(folder_name, "valid.txt")
+    test_path = os.path.join(folder_name, "test.txt")
+    with open(train_path, "w") as train:
+        with open(valid_path, "w") as valid:
+            with open(test_path, "w") as test:
+                with open(file_path) as file:
+                    for i, line in enumerate(file):
+                        if i < ff:
+                            if verbose:
+                                trmsg = '\rwriting train {} / {}'.format(i,
+                                                                         tlen)
+                                sys.stdout.write(trmsg)
+                                sys.stdout.flush()
+                            train.write(line)
+                        elif ff <= i < ff + rest:
+                            if verbose:
+                                vamsg = '\rwriting valid {} / {}'.format(i,
+                                                                         tlen)
+                                sys.stdout.write(vamsg)
+                                sys.stdout.flush()
+                            valid.write(line)
+                        else:
+                            if verbose:
+                                temsg = '\rwriting test {} / {}'.format(i,
+                                                                        tlen)
+                                sys.stdout.write(temsg)
+                                sys.stdout.flush()
+                            test.write(line)
+
+
+def _read_words(filename):
+    """
+    Transform a txt file in a list of words. The symbol "\n" is substitute
+    by "<eos>" (end of sentence)
+
+    :type filename: str
+    :rtype: list
+    """
+    with tf.gfile.GFile(filename, "r") as f:
+        return f.read().replace("\n", "<eos>").split()
+
+
+def _build_vocab(filename):
+    """
+    Using the _read_words function it reads a txt file
+    and creates a dict word: index with size of number
+    unique tokens. The most used tokens have lower indexes.
+
+    :type filename: str
+    :rtype: dict
+    """
+    data = _read_words(filename)
+
+    counter = collections.Counter(data)
+    count_pairs = sorted(counter.items(), key=lambda x: (-x[1], x[0]))
+
+    words, _ = list(zip(*count_pairs))
+    word_to_id = dict(zip(words, range(len(words))))
+
+    return word_to_id
+
+
+def _file_to_word_ids(filename, word_to_id):
+    """
+    Transform a txt file into a list of indices using
+    word_to_id.
+
+    :type filename: str
+    :type word_to_id: dict
+    :rtype: list
+    """
+    data = _read_words(filename)
+    return [word_to_id[word] for word in data if word in word_to_id]
+
+
+def folder2lists(data_path=None):
+    """
+    Reads text files, converts strings to integer ids
+    using the files from data directory "data_path".
+    It assumes that this directory contains 3 txt files:
+    "train.txt", "valid.txt" and "test.txt".
+
+    :type data_path: str
+    :rtype train_data: list
+    :rtype valid_data: list
+    :rtype test_data: list
+    :rtype vocabulary: int
+    """
+    train_path = os.path.join(data_path, "train.txt")
+    valid_path = os.path.join(data_path, "valid.txt")
+    test_path = os.path.join(data_path, "test.txt")
+
+    word_to_id = _build_vocab(train_path)
+    train_data = _file_to_word_ids(train_path, word_to_id)
+    valid_data = _file_to_word_ids(valid_path, word_to_id)
+    test_data = _file_to_word_ids(test_path, word_to_id)
+    vocabulary = len(word_to_id)
+    return train_data, valid_data, test_data, vocabulary
+
+
+def batch_producer(raw_data, batch_size, num_steps, name=None):
+    """
+    Iterate on the raw data returning batches of examples x,y.
+    Both x and t are shaped [batch_size, num_steps].
+    y is the same data time-shifted to the right by one.
+
+    Example:
+            raw_data = [4, 3, 2, 1, 0, 5, 6, 1, 1, 1, 1, 0, 3, 4, 1]
+            batch_size = 3
+            num_steps = 2
+            x, y = batch_producer(raw_data, batch_size, num_steps)
+
+            x = [[4, 3], [5, 6], [1, 0]]
+            y = [[3, 2], [6, 1], [0, 3]]
+
+    Raises:
+        tf.errors.InvalidArgumentError: if batch_size or
+        num_steps are too high.
+
+    :type raw_data: list
+    :type batch-size: int
+    :type num_steps: int
+    :type name: str
+    :rtype x: tensor
+    :rtype y: tensor
+    """
+    with tf.name_scope(name,
+                       "batch_producer",
+                       [raw_data, batch_size, num_steps]):
+        raw_data = tf.convert_to_tensor(raw_data,
+                                        name="raw_data",
+                                        dtype=tf.int32)
+
+        data_len = tf.size(raw_data)
+        batch_len = data_len // batch_size
+        data = tf.reshape(raw_data[0: batch_size * batch_len],
+                          [batch_size, batch_len])
+
+        epoch_size = (batch_len - 1) // num_steps
+        msg = "epoch_size == 0, decrease batch_size or num_steps"
+        assertion = tf.assert_positive(epoch_size,
+                                       message=msg)
+        with tf.control_dependencies([assertion]):
+            epoch_size = tf.identity(epoch_size, name="epoch_size")
+
+        i = tf.train.range_input_producer(epoch_size, shuffle=False).dequeue()
+        x = tf.strided_slice(data, [0, i * num_steps],
+                             [batch_size, (i + 1) * num_steps])
+        x.set_shape([batch_size, num_steps])
+        y = tf.strided_slice(data, [0, i * num_steps + 1],
+                             [batch_size, (i + 1) * num_steps + 1])
+        y.set_shape([batch_size, num_steps])
+        return x, y
