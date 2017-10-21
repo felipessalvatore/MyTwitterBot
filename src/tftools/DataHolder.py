@@ -105,7 +105,3 @@ class DataHolder():
             self.encoded_train = self.encoded_train[:num_debug]
             self.encoded_valid = self.encoded_valid[:num_debug]
             self.encoded_test = self.encoded_test[:num_debug]
-
-path= toy = os.path.join(parentdir, "data", "make_some_noise.txt")
-d = DataHolder(path, max_noums=10)
-print(d.vocab)
